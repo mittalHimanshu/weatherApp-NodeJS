@@ -1,14 +1,28 @@
 const https = require('https');
 const api = require('./api.json');
 
+function printWeather(weatherInfo){
+    if(weatherInfo.message){
+        const desc = `${weatherInfo.message}`;
+        console.log(desc);
+    }
+    else{
+        const temp = `Current temperature in ${weatherInfo.name} is ${weatherInfo.main.temp} \xB0C`;
+        const condition = `Weather condition in ${weatherInfo.name} is ${weatherInfo.weather[0].main}`;
+        console.log(temp); console.log(condition);
+    }
+}
+
 function get(query){
-    const request = https.get(`https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${api.key}`, respone => {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&appid=${api.key}`;
+    const request = https.get(url, response => {
         let body = "";
-        request.on('data', chunk => {
-            data += chunk;
+        response.on('data', chunk => {
+            body += chunk.toString();
         });
-        request.on('end', () => {
-            console.log(data);
+        response.on('end', () => {
+            const description = JSON.parse(body);
+            printWeather(description);
         });
     });
 }
